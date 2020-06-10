@@ -1,6 +1,7 @@
 #!/bin/bash
+LD_LIBRARY_PATH=~/lib/ 
 set -ex
-export TPU_HOST=10.6.0.5
+export TPU_HOST=10.255.128.3
 export TPU_NAME="${TPU_NAME:-tpu-v3-128-euw4a-4}"
 export MODEL_DIR="${MODEL_DIR:-gs://fontgan_euw4/model_runs/fonts_128_1}"
 #export DATASETS=gs://danbooru-euw4a/datasets/danbooru2019-s/danbooru2019-s-0*,gs://danbooru-euw4a/datasets/e621-s/e621-s-0*
