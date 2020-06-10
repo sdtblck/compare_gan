@@ -7,11 +7,11 @@
 
 # Recommended training platform: TPU v3-128.
 
-dataset.name = "images_256"
-options.datasets = "gs://dota-euw4a/datasets/danbooru2019figures/danbooru2019figures-0*"
+dataset.name = "images_128"
+options.datasets = "gs://fontgan_euw4/datasets/fonts_128/fonts_128-0**"
 options.random_labels = True
 options.num_classes = 1000
-train_imagenet_transform.crop_method = "resize_with_pad"
+# train_imagenet_transform.crop_method = "resize_with_pad"
 options.z_dim = 140
 options.g_flood = 0.05
 options.d_flood = 0.2
