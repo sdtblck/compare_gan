@@ -887,7 +887,7 @@ def random_cutout(tf_img, alpha=0.1, seed=None):
     height, width, channel = tf_img.shape
 
     # get square of random shape less than w*a, h*a
-    max_val = tf.cast(tf.minimum(alpha * width, alpha * height), dtype = tf.int32)
+    max_val = tf.cast(tf.minimum(alpha * int(width), alpha * int(height)), dtype = tf.int32)
     size = tf.random_uniform(shape=[], minval=0, maxval=max_val, dtype=tf.int32, seed=seed, name=None)
 
     # get random xy location of square
@@ -904,6 +904,7 @@ def random_cutout(tf_img, alpha=0.1, seed=None):
         mask = 1.0 - tf.image.pad_to_bounding_box(erase_area, y, x, height, width)
         erased_img = tf.multiply(tf_img, mask)
         return erased_img
+
 
 def _transform_imagenet_image(image, target_image_shape, crop_method, seed):
   """Preprocesses ImageNet images to have a target image shape.
