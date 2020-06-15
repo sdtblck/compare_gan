@@ -688,7 +688,6 @@ def zoom_in(tf_img, alpha=0.1, target_image_shape=None, seed=None):
     Image tensor with shape `target_image_shape`.
   """
 
-
   # Set params
   n = tf.random_uniform(shape=[], minval=1-alpha, maxval=1, dtype=tf.float32, seed=seed, name=None)
   h, w, c = tf_img.shape
@@ -956,7 +955,7 @@ def _transform_imagenet_image(image, target_image_shape, crop_method, seed):
     return image
   elif crop_method == "augs":
     choices = ['zoom in', 'zoom out', 'x_trans', 'y_trans', 'xy_trans', 'cutout']
-    choice = choices[np.random.randint(len(choices))]
+    choice = tf.random_uniform(shape=[], minval=0, maxval=len(choices), dtype=tf.int32, seed=None, name=None)
     if choice == 'zoom in':
         image = zoom_in(image, target_image_shape[:2])
     elif choice == 'zoom out':
