@@ -677,7 +677,7 @@ class LsunBedroomDataset(ImageDatasetV2):
     return image, label
 
 
-def zoom_in(tf_img, alpha=0.3, target_image_shape=None, seed=None):
+def zoom_in(tf_img, alpha=0.1, target_image_shape=None, seed=None):
   """
   Random zoom in to TF image
   Args:
@@ -719,7 +719,7 @@ def zoom_in(tf_img, alpha=0.3, target_image_shape=None, seed=None):
   return resized_img
 
 
-def zoom_out(tf_img, alpha=0.3, target_image_shape=None, seed=None):
+def zoom_out(tf_img, alpha=0.1, target_image_shape=None, seed=None):
   """
   Random zoom out of TF image
   Args:
@@ -763,7 +763,7 @@ def zoom_out(tf_img, alpha=0.3, target_image_shape=None, seed=None):
   return resized_img
 
 
-def X_translate(tf_img, alpha=0.3, target_image_shape=None, seed=None):
+def X_translate(tf_img, alpha=0.1, target_image_shape=None, seed=None):
     """
     Random X translation within TF image with reflection padding
     Args:
@@ -796,7 +796,7 @@ def X_translate(tf_img, alpha=0.3, target_image_shape=None, seed=None):
     return X_trans
 
 
-def XY_translate(tf_img, alpha=0.3, target_image_shape=None, seed=None):
+def XY_translate(tf_img, alpha=0.1, target_image_shape=None, seed=None):
   """
   Random XY translation within TF image with reflection padding
   Args:
@@ -832,7 +832,7 @@ def XY_translate(tf_img, alpha=0.3, target_image_shape=None, seed=None):
   return XY_trans
 
 
-def Y_translate(tf_img, alpha=0.3, target_image_shape=None, seed=None):
+def Y_translate(tf_img, alpha=0.1, target_image_shape=None, seed=None):
     """
     Random Y translation within TF image with reflection padding
     Args:
@@ -872,7 +872,7 @@ def Y_translate(tf_img, alpha=0.3, target_image_shape=None, seed=None):
     return Y_trans
 
 
-def random_cutout(tf_img, alpha=0.3, seed=None):
+def random_cutout(tf_img, alpha=0.1, seed=None):
     """
     Cuts random black square out from TF image
     Args:
