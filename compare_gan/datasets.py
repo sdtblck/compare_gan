@@ -736,7 +736,6 @@ def zoom_out(tf_img, alpha=0.3, target_image_shape=None):
   rnd_w = int(w) * n
   paddings = [[int(rnd_h), int(rnd_h)], [int(rnd_w), int(rnd_w)], [0, 0]]
   padded_img = tf.pad(tf_img, paddings, 'REFLECT')
-  print(padded_img.shape)
   size = (int((1+n)*int(h)), int((1+n)*int(w)), c)
 
   # Random crop to size (1+a)*H, (1+a)*W
