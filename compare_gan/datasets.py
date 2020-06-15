@@ -875,8 +875,7 @@ def random_cutout(tf_img, alpha=0.3):
     if erase_area.shape == (0, 0, 3):
         return tf_img
     else:
-        mask = 1.0 - tf.image.pad_to_bounding_box(erase_area, y, x,
-                                                height, width)
+        mask = 1.0 - tf.image.pad_to_bounding_box(erase_area, y, x, height, width)
         erased_img = tf.multiply(tf_img, mask)
 
         return erased_img
