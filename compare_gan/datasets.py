@@ -757,7 +757,7 @@ def zoom_out(tf_img, alpha=0.1, target_image_shape=None, seed=None):
 
   # Resize back to original size
   resized_img = tf.image.resize(
-      r_cropped_img, target_image_shape, method=tf.image.ResizeMethod.BILINEAR, preserve_aspect_ratio=False,
+      r_cropped_img, (target_image_shape + (c,)), method=tf.image.ResizeMethod.BILINEAR, preserve_aspect_ratio=False,
       name=None
   )
   return resized_img
@@ -789,7 +789,7 @@ def X_translate(tf_img, alpha=0.1, target_image_shape=None, seed=None):
     # Random crop section at original size
     X_trans = tf.image.random_crop(
         padded_img,
-        (h, w, c),
+        (target_image_shape + (c,)),
         seed=seed,
         name=None)
 
@@ -865,7 +865,7 @@ def Y_translate(tf_img, alpha=0.1, target_image_shape=None, seed=None):
     # Random crop section at original size
     Y_trans = tf.image.random_crop(
         padded_img,
-        (h, w, c),
+        (target_image_shape + (c,)),
         seed=seed,
         name=None)
 
