@@ -677,11 +677,11 @@ class LsunBedroomDataset(ImageDatasetV2):
     return image, label
 
 
-def zoom_in(tf_img, alpha=0.3, target_image_shape=None):
+def zoom_in(tf_img, alpha=0.3, target_image_shape=None, seed=None):
   """
   Random zoom in to TF image
   Args:
-    tf_img: 3-D tensor with a single image.
+    image: 3-D tensor with a single image.
     alpha: strength of augmentation
     target_image_shape: List/Tuple with target image shape.
   Returns:
@@ -690,10 +690,15 @@ def zoom_in(tf_img, alpha=0.3, target_image_shape=None):
 
 
   # Set params
-  n = np.random.uniform(1-alpha, 1)
+  n = tf.random_uniform(shape=[], minval=1-alpha, maxval=1, dtype=tf.float32, seed=seed, name=None)
   h, w, c = tf_img.shape
-  rnd_h = int(int(h) * n)
-  rnd_w = int(int(w) * n)
+
+  h_t = tf.cast(
+    h, dtype=tf.float32, name=None)
+  w_t = tf.cast(
+    w, dtype=tf.float32, name=None)
+  rnd_h = h_t*n
+  rnd_w = w_t*n
   if target_image_shape is None:
     target_image_shape = (h, w)
 
@@ -702,7 +707,7 @@ def zoom_in(tf_img, alpha=0.3, target_image_shape=None):
   cropped_img = tf.image.random_crop(
       tf_img,
       crop_size,
-      seed=None,
+      seed=seed,
       name=None
   )
 
@@ -714,7 +719,7 @@ def zoom_in(tf_img, alpha=0.3, target_image_shape=None):
   return resized_img
 
 
-def zoom_out(tf_img, alpha=0.3, target_image_shape=None):
+def zoom_out(tf_img, alpha=0.3, target_image_shape=None, seed=None):
   """
   Random zoom out of TF image
   Args:
@@ -726,35 +731,39 @@ def zoom_out(tf_img, alpha=0.3, target_image_shape=None):
   """
 
   # Set params
-  n = np.random.uniform(0, alpha)
+  n = tf.random_uniform(shape=[], minval=0, maxval=alpha, dtype=tf.float32, seed=seed, name=None)
   h, w, c = tf_img.shape
   if target_image_shape is None:
     target_image_shape = (h, w)
 
   # Pad image to size (1+2a)*H, (1+2a)*W
-  rnd_h = int(h) * n
-  rnd_w = int(w) * n
-  paddings = [[int(rnd_h), int(rnd_h)], [int(rnd_w), int(rnd_w)], [0, 0]]
+  h_t = tf.cast(
+    h, dtype=tf.float32, name=None)
+  w_t = tf.cast(
+    w, dtype=tf.float32, name=None)
+  rnd_h = h_t*n
+  rnd_w = w_t*n
+  paddings = [[rnd_h, rnd_h], [rnd_w, rnd_w], [0, 0]]
   padded_img = tf.pad(tf_img, paddings, 'REFLECT')
-  size = (int((1+n)*int(h)), int((1+n)*int(w)), c)
+  size = ((1+n) * h_t, (1+n) * w_t, c)
 
   # Random crop to size (1+a)*H, (1+a)*W
-  cropped_img = tf.image.random_crop(
+  r_cropped_img = tf.image.random_crop(
       padded_img,
       size,
-      seed=None,
+      seed=seed,
       name=None
   )
 
   # Resize back to original size
   resized_img = tf.image.resize(
-      cropped_img, target_image_shape, method=tf.image.ResizeMethod.BILINEAR, preserve_aspect_ratio=False,
+      r_cropped_img, target_image_shape, method=tf.image.ResizeMethod.BILINEAR, preserve_aspect_ratio=False,
       name=None
   )
   return resized_img
 
 
-def X_translate(tf_img, alpha=0.3, target_image_shape=None):
+def X_translate(tf_img, alpha=0.3, target_image_shape=None, seed=None):
     """
     Random X translation within TF image with reflection padding
     Args:
@@ -764,27 +773,30 @@ def X_translate(tf_img, alpha=0.3, target_image_shape=None):
     Returns:
       Image tensor with shape `target_image_shape`.
     """
-    n = np.random.uniform(0, alpha)
+    n = tf.random_uniform(shape=[], minval=0, maxval=alpha, dtype=tf.float32, seed=seed, name=None)
+
     h, w, c = tf_img.shape
     if target_image_shape is None:
         target_image_shape = (h, w)
 
     # Pad image to size H, (1+2a)*W
-    rnd_w = int(w) * n
-    paddings = [[0, 0], [int(rnd_w), int(rnd_w)], [0, 0]]
+    w_t = tf.cast(
+        w, dtype=tf.float32, name=None)
+    rnd_w = w_t * n
+    paddings = [[0, 0], [rnd_w, rnd_w], [0, 0]]
     padded_img = tf.pad(tf_img, paddings, 'REFLECT')
 
     # Random crop section at original size
     X_trans = tf.image.random_crop(
         padded_img,
-        (target_image_shape + (c,)),
-        seed=None,
+        (h, w, c),
+        seed=seed,
         name=None)
 
     return X_trans
 
 
-def XY_translate(tf_img, alpha=0.3, target_image_shape=None):
+def XY_translate(tf_img, alpha=0.3, target_image_shape=None, seed=None):
   """
   Random XY translation within TF image with reflection padding
   Args:
@@ -795,28 +807,32 @@ def XY_translate(tf_img, alpha=0.3, target_image_shape=None):
     Image tensor with shape `target_image_shape`.
   """
 
-  n = np.random.uniform(0, (alpha))
+  n = tf.random_uniform(shape=[], minval=0, maxval=alpha, dtype=tf.float32, seed=seed, name=None)
   h, w, c = tf_img.shape
   if target_image_shape is None:
     target_image_shape = (h, w)
 
   # Pad image to size (1+2a)*H, (1+2a)*W
-  rnd_h = int(h) * n
-  rnd_w = int(w) * n
-  paddings = [[int(rnd_h), int(rnd_h)], [int(rnd_w), int(rnd_w)], [0, 0]]
+  h_t = tf.cast(
+    h, dtype=tf.float32, name=None)
+  w_t = tf.cast(
+    w, dtype=tf.float32, name=None)
+  rnd_h = h_t*n
+  rnd_w = w_t*n
+  paddings = [[rnd_h, rnd_h], [rnd_w, rnd_w], [0, 0]]
   padded_img = tf.pad(tf_img, paddings, 'REFLECT')
 
   # Random crop section at original size
   XY_trans = tf.image.random_crop(
       padded_img,
       (target_image_shape + (c,)),
-      seed=None,
+      seed=seed,
       name=None
   )
   return XY_trans
 
 
-def Y_translate(tf_img, alpha=0.3, target_image_shape=None):
+def Y_translate(tf_img, alpha=0.3, target_image_shape=None, seed=None):
     """
     Random Y translation within TF image with reflection padding
     Args:
@@ -826,30 +842,39 @@ def Y_translate(tf_img, alpha=0.3, target_image_shape=None):
     Returns:
       Image tensor with shape `target_image_shape`.
     """
-    n = np.random.uniform(0, alpha)
+    n = tf.random_uniform(shape=[], minval=0, maxval=alpha, dtype=tf.float32, seed=seed, name=None)
+
     h, w, c = tf_img.shape
     if target_image_shape is None:
         target_image_shape = (h, w)
 
-    # Pad image to size (1+2a)*H, (1+2a)*W
-    rnd_h = int(h) * n
-    paddings = [[int(rnd_h), int(rnd_h)], [0, 0], [0, 0]]
+    # Pad image to size H, (1+2a)*W
+    w_t = tf.cast(
+        w, dtype=tf.float32, name=None)
+    rnd_w = w_t * n
+    paddings = [[0, 0], [rnd_w, rnd_w], [0, 0]]
+    padded_img = tf.pad(tf_img, paddings, 'REFLECT')
+
+    # Pad image to size (1+2a)*H, W
+    h_t = tf.cast(
+        h, dtype=tf.float32, name=None)
+    rnd_h = h_t * n
+    paddings = [[rnd_h, rnd_h], [0, 0], [0, 0]]
     padded_img = tf.pad(tf_img, paddings, 'REFLECT')
 
     # Random crop section at original size
     Y_trans = tf.image.random_crop(
         padded_img,
-        (target_image_shape + (c,)),
-        seed=None,
+        (h, w, c),
+        seed=seed,
         name=None)
 
     return Y_trans
 
 
-def random_cutout(tf_img, alpha=0.3):
+def random_cutout(tf_img, alpha=0.3, seed=None):
     """
     Cuts random black square out from TF image
-
     Args:
     image: 3-D tensor with a single image.
     alpha: affects max size of square
@@ -862,13 +887,15 @@ def random_cutout(tf_img, alpha=0.3):
     height, width, channel = tf_img.shape
 
     # get square of random shape less than w*a, h*a
-    size = np.random.randint(0, tf.minimum(alpha * int(width), alpha * int(height)))
+    max_val = tf.cast(tf.minimum(alpha * width, alpha * height), dtype = tf.int32)
+    size = tf.random_uniform(shape=[], minval=0, maxval=max_val, dtype=tf.int32, seed=seed, name=None)
 
     # get random xy location of square
     x_loc_upper_bound = width - size
     y_loc_upper_bound = height - size
-    x = np.random.randint(0, x_loc_upper_bound)
-    y = np.random.randint(0, y_loc_upper_bound)
+
+    x = tf.random_uniform(shape=[], minval=0, maxval=x_loc_upper_bound, dtype=tf.int32, seed=seed, name=None)
+    y = tf.random_uniform(shape=[], minval=0, maxval=y_loc_upper_bound, dtype=tf.int32, seed=seed, name=None)
 
     erase_area = tf.ones([size, size, 3], dtype=tf.float32)
     if erase_area.shape == (0, 0, 3):
@@ -876,9 +903,7 @@ def random_cutout(tf_img, alpha=0.3):
     else:
         mask = 1.0 - tf.image.pad_to_bounding_box(erase_area, y, x, height, width)
         erased_img = tf.multiply(tf_img, mask)
-
         return erased_img
-
 
 def _transform_imagenet_image(image, target_image_shape, crop_method, seed):
   """Preprocesses ImageNet images to have a target image shape.
