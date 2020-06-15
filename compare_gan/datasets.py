@@ -857,8 +857,6 @@ def random_cutout(tf_img, alpha=0.3):
     target_image_shape: List/Tuple with target image shape.
     Returns:
     Cutout Image tensor
-
-    Not *100*% sure this one works yet
     """
 
     # get img shape
@@ -873,13 +871,15 @@ def random_cutout(tf_img, alpha=0.3):
     x = np.random.randint(0, x_loc_upper_bound)
     y = np.random.randint(0, y_loc_upper_bound)
 
-    # erase_area = tf.zeros([size, size, channel], dtype=tf.dtypes.uint8)
     erase_area = tf.ones([size, size, 3], dtype=tf.float32)
-    mask = 1.0 - tf.image.pad_to_bounding_box(erase_area, y, x,
-                                              height, width)
-    erased_img = tf.multiply(tf_img, mask)
+    if erase_area.shape == (0, 0, 3):
+        return tf_img
+    else:
+        mask = 1.0 - tf.image.pad_to_bounding_box(erase_area, y, x,
+                                                height, width)
+        erased_img = tf.multiply(tf_img, mask)
 
-    return erased_img
+        return erased_img
 
 
 def _transform_imagenet_image(image, target_image_shape, crop_method, seed):
