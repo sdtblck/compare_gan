@@ -858,11 +858,12 @@ def random_cutout(tf_img, alpha=0.3):
     Returns:
     Cutout Image tensor
     """
+
     # get img shape
     height, width, channel = tf_img.shape
 
     # get square of random shape less than w*a, h*a
-    size = np.random.randint(0, tf.minimum(alpha * width, alpha * height))
+    size = np.random.randint(0, tf.minimum(alpha * int(width), alpha * int(height)))
 
     # get random xy location of square
     x_loc_upper_bound = width - size
@@ -870,8 +871,11 @@ def random_cutout(tf_img, alpha=0.3):
     x = np.random.randint(0, x_loc_upper_bound)
     y = np.random.randint(0, y_loc_upper_bound)
 
-    erase_area = tf.zeros([size, size, channel], dtype=tf.dtypes.uint8)
-    erased_img = tf_img[y:y+size, x:x+size, :].assign(erase_area)
+    # erase_area = tf.zeros([size, size, channel], dtype=tf.dtypes.uint8)
+    erase_area = tf.ones([size, size, 3], dtype=tf.float32)
+    mask = 1.0 - tf.image.pad_to_bounding_box(erase_area, y, x,
+                                              height, width)
+    erased_img = tf.multiply(tf_img, mask)
 
     return erased_img
 
